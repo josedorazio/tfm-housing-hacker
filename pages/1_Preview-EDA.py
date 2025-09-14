@@ -32,3 +32,7 @@ with col1:
 with col2:
     st.subheader("Last 5 rows")
     st.dataframe(df.tail())
+
+# 3. Duplicates
+st.header("Data Quality", divider=True)
+st.write(f"Number of duplicate rows: {df.duplicated().sum()}")
