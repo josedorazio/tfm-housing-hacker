@@ -22,3 +22,13 @@ st.dataframe(
         {"dtype": df.dtypes, "missing": df.isna().sum(), "unique_values": df.nunique()}
     )
 )
+
+# 2. Head & Tail
+st.header("Preview of Data", divider=True)
+col1, col2 = st.columns(2)
+with col1:
+    st.subheader("First 5 rows")
+    st.dataframe(df.head())
+with col2:
+    st.subheader("Last 5 rows")
+    st.dataframe(df.tail())
