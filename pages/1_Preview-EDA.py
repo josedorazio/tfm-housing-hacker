@@ -91,3 +91,31 @@ elif option == "Categorical Variables":
 else:
     st.subheader("Full Dataset (first rows)")
     st.dataframe(df.head())
+
+
+st.header("Correlation Heatmap")
+
+# Compute correlation matrix
+corr = df_numeric.corr()
+
+import plotly.express as px
+
+# Optionally let user pick numeric columns
+cols = st.multiselect(
+    "Select numeric columns for correlation",
+    df_numeric.columns,
+    default=df_numeric.columns.tolist(),
+)
+
+# Correlation matrix
+corr = df_numeric[cols].corr()
+
+# Interactive heatmap
+fig = px.imshow(corr, text_auto=True, color_continuous_scale="RdBu_r", aspect="auto")
+
+fig.update_layout(
+    width=1200,  # width in pixels
+    height=800,  # height in pixels
+    margin=dict(l=50, r=50, t=50, b=50),
+)
+st.plotly_chart(fig)
