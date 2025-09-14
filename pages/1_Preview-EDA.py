@@ -36,3 +36,58 @@ with col2:
 # 3. Duplicates
 st.header("Data Quality", divider=True)
 st.write(f"Number of duplicate rows: {df.duplicated().sum()}")
+
+# 4. Quick Descriptive Statistics
+df_numeric = df.select_dtypes(include="number")
+df_categoric = df.select_dtypes(exclude="number")
+cols_to_drop = [
+    "url",
+    "externalReference",
+    "thumbnail",
+    "description",
+    "suggestedTexts.title",
+    "suggestedTexts.subtitle",
+    "notes",
+    "address",
+    "country",
+    "province",
+    "operation",
+    "priceInfo.price.currencySuffix",
+    "topNewDevelopment",
+]
+df_categoric.drop(columns=cols_to_drop, inplace=True)
+
+
+option = st.selectbox(
+    "Select which data to preview:",
+    ("Numeric Variables", "Categorical Variables", "Full Dataset"),
+)
+
+if option == "Numeric Variables":
+    st.subheader("Numeric Variables (first rows)")
+    st.dataframe(df_numeric.head())
+    st.subheader("Summary Statistics")
+    st.dataframe(df_numeric.describe().T)
+    st.subheader("Numeric Variable Distributions", divider=True)
+    num_var = st.selectbox("Select numeric variable", df_numeric.columns)
+    num_plot_type = st.radio("Select plot type", ("Histogram", "Boxplot"))
+    fig, ax = plt.subplots(figsize=(8, 4))
+    if num_plot_type == "Histogram":
+        sns.histplot(df_numeric[num_var], kde=True, ax=ax)
+    else:
+        sns.boxplot(x=df_numeric[num_var], ax=ax)
+    st.pyplot(fig)
+
+elif option == "Categorical Variables":
+    st.subheader("Categorical Variables (first rows)")
+    st.dataframe(df_categoric.head())
+
+    # Dropdown to select specific categorical variable
+    cat_var = st.selectbox("Select a categorical variable", df_categoric.columns)
+    # Display value counts as a bar chart
+    st.subheader(f"Distribution of {cat_var}")
+    st.bar_chart(df[cat_var].value_counts())
+
+else:
+    st.subheader("Full Dataset (first rows)")
+    st.dataframe(df.head())
