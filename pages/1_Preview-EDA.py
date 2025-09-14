@@ -2,14 +2,18 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-
+from dotenv import load_dotenv
+import os
 
 st.set_page_config(page_title="Preprocessing", layout="wide")
 st.title("Data Preview and EDA")
 
+# Load environment variables
+load_dotenv(".env.prod")
+dataset_path = os.getenv("DATASET_URL")
 
-## Add This
-url = "https://raw.githubusercontent.com/guille1006/TFM/refs/heads/main/data2/total_data.csv"
+## Access Dataset
+url = dataset_path
 df = pd.read_csv(url)
 
 # 1. Dataset Info at a Glance
