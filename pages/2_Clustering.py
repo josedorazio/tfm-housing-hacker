@@ -7,8 +7,9 @@ import os
 import numpy as np
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
-from sklearn.metrics import silhouette_score
 import folium
+from folium.plugins import MarkerCluster
+from streamlit_folium import st_folium
 
 # Initialize Streamlit page config and title
 st.set_page_config(page_title="Clustering", layout="wide")
@@ -76,64 +77,61 @@ df_limpios[deal_score_col] = (
 ) / df_limpios[median_price_col]
 # Comparación visual de las distribuciones de deal_score
 st.subheader(f"Distribución del Deal Score para (k={k})")
-fig_hist, ax = plt.subplots(figsize=(8, 4))
+fig_hist, ax = plt.subplots(figsize=(8, 3))
 sns.histplot(df_limpios[deal_score_col], kde=True, bins=30, ax=ax)
-ax.set_title(f"Distribución del Deal Score (k={k})")
-st.pyplot(fig_hist)
+ax.set_title(f"Distribución del Deal Score (k={k})", fontsize=16)
+st.pyplot(fig_hist, use_container_width=True)
 
 
-# # Lista de k y las columnas correspondientes
-# deal_score_cols = [f'deal_score_k{k}' for k in k_values]
+# Visualización Maka
+def visualizar_clusters_en_mapa(df, k, sample_per_cluster=500):
+    """
+    Genera un mapa de Folium visualizando los clusters para un valor k específico.
 
-# for i, col in enumerate(deal_score_cols):
-#     sns.histplot(ax=axes[i], data=df_limpios, x=col, kde=True, bins=50)
-#     axes[i].axvline(0, color='r', linestyle='--')
-#     std_dev = df_limpios[col].std()
-#     axes[i].set_title(f'k = {k_values[i]} (Std Dev: {std_dev:.2f})')
-#     axes[i].set_xlabel('Deal Score')
+    Args:
+        df (pd.DataFrame):
+        k (int): El número de clusters.
+    """
+    # Construye el nombre de la columna dinámicamente a partir de k
+    cluster_col = f"zona_cluster_k{k}"
 
-# axes[0].set_ylabel('Frecuencia')
-# plt.tight_layout(rect=[0, 0.03, 1, 0.95])
+    # Mapa base centrado en Madrid
+    mapa = folium.Map(
+        location=[df["latitude"].mean(), df["longitude"].mean()], zoom_start=11
+    )
 
-# # Display the second figure in Streamlit
-# st.pyplot(fig_hist)
+    # Paleta de colores
+    num_clusters = df[cluster_col].nunique()
+    colors = sns.color_palette("bright", n_colors=num_clusters).as_hex()
 
-# def visualizar_clusters_en_mapa(df, k):
-#     """
-#     Genera un mapa de Folium visualizando los clusters para un valor k específico.
+    # Añadir puntos al mapa
+    marker_cluster = MarkerCluster().add_to(mapa)
 
-#     Args:
-#         df (pd.DataFrame):
-#         k (int): El número de clusters.
-#     """
-#     # Construye el nombre de la columna dinámicamente a partir de k
-#     cluster_col = f'zona_cluster_k{k}'
+    for cluster_id in range(num_clusters):
+        df_cluster = df[df[cluster_col] == cluster_id].sample(
+            n=min(sample_per_cluster, df[df[cluster_col] == cluster_id].shape[0]),
+            random_state=42,
+        )
 
-#     # Mapa base centrado en Madrid
-#     mapa = folium.Map(location=[df['latitude'].mean(), df['longitude'].mean()], zoom_start=11)
+        for _, row in df_cluster.iterrows():
+            folium.CircleMarker(
+                location=[row["latitude"], row["longitude"]],
+                radius=3,
+                color=colors[cluster_id],
+                fill=True,
+                fill_color=colors[cluster_id],
+                fill_opacity=0.6,
+                popup=f"Zona k={k}: {cluster_id}<br>Precio: {row['price']:,.0f} €",
+            ).add_to(marker_cluster)
 
-#     # Paleta de colores
-#     num_clusters = df[cluster_col].nunique()
-#     colors = sns.color_palette('bright', n_colors=num_clusters).as_hex()
+    return mapa
 
-#     # Añadir puntos al mapa
-#     sample_size = df.shape[0]
-#     df_sample = df.sample(n=sample_size, random_state=42)
 
-#     for index, row in df_sample.iterrows():
-#         cluster_id = row[cluster_col]
-
-#         folium.CircleMarker(
-#             location=[row['latitude'], row['longitude']],
-#             radius=3,
-#             color=colors[cluster_id],
-#             fill=True,
-#             fill_color=colors[cluster_id],
-#             fill_opacity=0.6,
-#             popup=f"Zona k={k}: {cluster_id}<br>Precio: {row['price']:,.0f} €"
-#         ).add_to(mapa)
-
-#     return mapa
-
-# mapa_k50 = visualizar_clusters_en_mapa(df_limpios, 50) #Cambiar el valor a uno de los calculados antes por si quieres comparar
-# mapa_k50
+st.set_page_config(page_title="Map Clustering", layout="wide")
+st.title("Geographic Visualization from Clusters")
+map = visualizar_clusters_en_mapa(df_limpios, k)
+if map:
+    st.subheader(f"Map with Clusters (k={k})")
+    st_folium(map, width=1000, height=700)
+else:
+    print("Map is not working")
