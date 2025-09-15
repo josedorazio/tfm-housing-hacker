@@ -11,8 +11,6 @@ st.title("Data Preview and EDA")
 # Load environment variables
 load_dotenv(".env.prod")
 dataset_path = os.getenv("DATASET_PATH")
-
-## Access Dataset
 url = dataset_path
 df = pd.read_csv(url)
 
