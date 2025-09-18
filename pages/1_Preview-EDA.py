@@ -114,6 +114,6 @@ else:
     )
 
 st.header("Correlation Heatmap")
-with open(os.path.join(CACHE_DIR, "corr_heatmap.html"), "r") as f:
+with open(os.path.join(CACHE_DIR, "corr_heatmap.html"), "r", encoding="utf-8") as f:
     html_content = f.read()
     components.html(html_content, height=800, width=1200)
