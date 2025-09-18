@@ -12,7 +12,6 @@ PLOTS_DIR = os.path.join(CACHE_DIR, "plots")
 st.set_page_config(page_title="Preprocessing", layout="wide")
 st.title("Data Preview and EDA")
 
-
 # --- Load Precomputed Data ---
 @st.cache_data
 def load_precomputed_data():
@@ -43,13 +42,9 @@ precomputed_data = load_precomputed_data()
 
 # --- Display Precomputed Results ---
 st.header("Info at a Glance", divider=True)
-# Shape info (assumes it's not a precomputed table, so you might need to run the script once to get it)
 st.write(
     f"**Shape:** Data shape not precomputed. Please run the EDA script to get this value."
 )
-# The number of rows and columns can be a bit tricky to precompute, as it's a single value,
-# you can either include it in a file or compute it once in the precomputation script and save it.
-# A simpler way is to just display a static message since the app is for EDA.
 
 st.subheader("Column Overview", divider=True)
 st.dataframe(precomputed_data["column_overview"])
@@ -108,7 +103,6 @@ elif option == "Categorical Variables":
 
 else:
     st.subheader("Full Dataset (first rows)")
-    # This isn't precomputed, but you can choose to show one of the other tables.
     st.write(
         "Full dataset preview is not precomputed for display. Please select an option above."
     )

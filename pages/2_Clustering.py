@@ -11,12 +11,10 @@ MAPS_DIR = os.path.join(CACHE_DIR, "maps")
 st.set_page_config(page_title="Clustering", layout="wide")
 st.title("Clustering")
 
-
 # --- Load Precomputed Data ---
 @st.cache_data
 def load_k_values():
     return [6, 15, 30, 50, 200]
-
 
 k_values = load_k_values()
 option = st.selectbox("Select a Cluster (k) value:", k_values)
