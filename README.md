@@ -71,6 +71,26 @@ git clone https://github.com/your-username/tfm-housing-hacker.git
 cd tfm-housing-hacker
 ```
 
+# Create the virtual environment
+
+```
+python -m venv .venv
+```
+
+# Activate it
+
+# On Linux/Mac:
+
+```
+source .venv/bin/activate
+```
+
+# On Windows (PowerShell):
+
+```
+.venv\Scripts\Activate.ps1
+```
+
 Install dependencies:
 
 ```
