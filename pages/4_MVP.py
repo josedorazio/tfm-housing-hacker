@@ -60,7 +60,7 @@ with st.form("search_form"):
 
     submitted = st.form_submit_button("Search for Deals 🔍")
 
-# --- Display Results ---
+# --- Display Results from Search Form ---
 if submitted:
     st.markdown("---")
 
@@ -102,36 +102,35 @@ if submitted:
             )
         )
 
-        # --- NEW FEATURE: Deal Comparables ---
+        # --- NEW FEATURE: Deal Comparables (Smarter Version) ---
         st.markdown("---")
-        st.subheader("Deal Comparables: Top 10 Overall Deals")
+        st.subheader("Deal Comparables: Top Deals in This Area")
         st.info(
-            "The table below shows the top 10 most undervalued properties in the entire dataset. This provides a benchmark of what an exceptional deal looks like. "
+            "The table below shows the top 4 most undervalued properties from the same neighborhood as your search results. This provides a more relevant benchmark."
         )
 
-        # Get the top 10 deals from the pre-computed dataframe
-        top_deals = df_undervalued.sort_values(by="diferencia", ascending=False).head(
-            10
-        )
+        # Find the most common 'zona_cluster' from the filtered results
+        if not filtered_deals.empty:
+            top_cluster = filtered_deals["zona_cluster"].mode()[0]
 
-        # Display the comparables table
-        st.dataframe(
-            top_deals[
-                [
-                    "price",
-                    "size",
-                    "rooms",
-                    "zona_cluster",
-                    "deal_score_predicho",
-                    "deal_score_real",
-                ]
-            ].rename(
-                columns={
-                    "deal_score_predicho": "Predicted Deal Score",
-                    "deal_score_real": "Actual Deal Score",
-                }
+            # Find the top 4 deals from the entire dataset that are in this specific cluster
+            comparable_deals = (
+                df_undervalued[df_undervalued["zona_cluster"] == top_cluster]
+                .sort_values(by="diferencia", ascending=False)
+                .head(4)
             )
-        )
+
+            # Display the comparables table
+            st.dataframe(
+                comparable_deals[
+                    ["price", "size", "rooms", "deal_score_predicho", "deal_score_real"]
+                ].rename(
+                    columns={
+                        "deal_score_predicho": "Predicted Deal Score",
+                        "deal_score_real": "Actual Deal Score",
+                    }
+                )
+            )
 
         # --- Map Visualization ---
         st.markdown("---")
