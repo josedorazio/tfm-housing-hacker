@@ -2,7 +2,9 @@ import streamlit as st
 
 st.set_page_config(page_title="TFM Housing Hacker", page_icon="🏡", layout="wide")
 
-st.title("🏡 Análisis de Precios de Viviendas")
+st.title(
+    "🏡 Detección de propiedades infravaloradas mediante redes neuronales y análisis semántico de descripciones inmobiliarias"
+)
 
 # st.sidebar.title("Navegación")
 
